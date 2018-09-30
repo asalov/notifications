@@ -3,13 +3,17 @@
     <div class="header">
       Notifications
     </div>
-    <div class="notification-list">
+    <transition-group
+      name="notification"
+      tag="div"
+      class="notification-list"
+    >
       <Notification
-        v-for="item in notifications"
+        v-for="item in data"
         :key="item.id"
-        :text="item.text"
+        :item="item"
       />
-    </div>
+    </transition-group>
   </div>
 </template>
 
@@ -21,14 +25,8 @@ export default {
   components: {
     Notification,
   },
-  data() {
-    return {
-      notifications: [
-        { id: 1, text: 'Notification text 1' },
-        { id: 2, text: 'Notification text 2' },
-        { id: 3, text: 'Notification text 3' },
-      ],
-    };
+  props: {
+    data: Array,
   },
 };
 </script>
@@ -68,4 +66,16 @@ export default {
   border-radius: 0 0 4px 4px;
 }
 
+.notification-enter-active, .notification-leave-active {
+  transition: all 0.5s;
+}
+
+.notification-enter, .notification-leave-to {
+  opacity: 0;
+  transform: translateX(100px);
+}
+
+.notification-move {
+  transition: transform 0.5s;
+}
 </style>

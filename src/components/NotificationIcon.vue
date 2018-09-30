@@ -5,8 +5,8 @@
     @click="$emit('showNotifications')"
   >
     <Badge
-      v-show="count"
-      :count="count"
+      v-show="total"
+      :total="total"
     />
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
       <path d="M18 15.984l2.016 2.016v0.984h-16.031v-0.984l2.016-2.016v-4.969c0-3.094
@@ -28,11 +28,7 @@ export default {
   },
   props: {
     active: Boolean,
-  },
-  data() {
-    return {
-      count: 2,
-    };
+    total: Number,
   },
 };
 </script>
