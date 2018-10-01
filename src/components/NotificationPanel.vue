@@ -9,7 +9,7 @@
       class="notification-list"
     >
       <Notification
-        v-for="item in data"
+        v-for="item in notifications"
         :key="item.id"
         :item="item"
       />
@@ -27,6 +27,51 @@ export default {
   },
   props: {
     data: Array,
+    opened: Boolean,
+  },
+  data() {
+    return {
+      timeOpened: null,
+      expirationCheckInterval: null,
+      notifications: [],
+    };
+  },
+  computed: {
+    notificationTotal() {
+      return this.notifications.length;
+    },
+  },
+  methods: {
+    showAvailableNotifications() {
+      const now = this.getSecondsTimestamp();
+
+      this.notifications = this.data.filter((item) => {
+        const { expires } = item;
+
+        if (expires) {
+          return (now - expires) <= this.timeOpened;
+        }
+
+        return true;
+      });
+    },
+    getSecondsTimestamp() {
+      return new Date().getTime() / 1000;
+    },
+  },
+  watch: {
+    opened() {
+      this.timeOpened = this.getSecondsTimestamp();
+      this.showAvailableNotifications();
+
+      this.expirationCheckInterval = setInterval(this.showAvailableNotifications, 1000);
+    },
+    notificationTotal() {
+      this.$emit('notificationListChanged', this.notifications);
+    },
+  },
+  destroyed() {
+    clearInterval(this.expirationCheckInterval);
   },
 };
 </script>

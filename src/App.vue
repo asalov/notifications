@@ -10,6 +10,8 @@
         <NotificationPanel
           v-show="showMenu"
           :data="notifications"
+          :opened="menuOpened"
+          @notificationListChanged="updateNotificationList"
         />
       </transition>
     </div>
@@ -30,16 +32,18 @@ export default {
   data() {
     return {
       showMenu: false,
+      menuOpened: false,
+      requestInterval: null,
       notifications: [],
     };
   },
   created() {
     this.getNotifications();
 
-    this.interval = setInterval(this.getNotifications, 5000);
+    this.requestInterval = setInterval(this.getNotifications, 5000);
   },
   destroyed() {
-    clearInterval(this.interval);
+    clearInterval(this.requestInterval);
   },
   computed: {
     totalNotifications() {
@@ -49,12 +53,30 @@ export default {
   methods: {
     toggleMenu() {
       this.showMenu = !this.showMenu;
+
+      if (!this.menuOpened) {
+        this.menuOpened = true;
+      }
     },
     getNotifications() {
       FetchService.get('notifications')
         .then((res) => {
           this.notifications = res;
         });
+    },
+    updateNotificationList(data) {
+      /*
+        In a real scenario, you would probably not have to do this,
+        as the backend will be automatically updated when a notification expires
+      */
+      const removedItem = this.notifications.find(item => !data.includes(item));
+
+      if (removedItem) {
+        FetchService.remove(`notifications/${removedItem.id}`)
+          .then(() => {
+            this.notifications = data;
+          });
+      }
     },
   },
 };
