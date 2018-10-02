@@ -1,7 +1,16 @@
 <template>
   <div class="notification">
-    <h3>{{ item.title }}</h3>
-    <p v-if="item.text">{{ item.text }}</p>
+    <div class="notification-data">
+      <h3>{{ item.title }}</h3>
+      <p>
+        <a
+          v-if="hasLink"
+          :href="itemContent"
+          target="_blank"
+        >{{ itemContent }}</a>
+        <span v-else>{{ itemContent }}</span>
+      </p>
+    </div>
   </div>
 </template>
 
@@ -10,6 +19,21 @@ export default {
   name: 'Notification',
   props: {
     item: Object,
+  },
+  computed: {
+    itemContent() {
+      const { item } = this;
+      const contentTypes = {
+        text: 'text',
+        bonus: 'requirement',
+        promotion: 'link',
+      };
+
+      return item[contentTypes[item.type]];
+    },
+    hasLink() {
+      return this.item.link;
+    },
   },
 };
 </script>

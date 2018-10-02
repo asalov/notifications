@@ -2,6 +2,18 @@
 
 A notifications component built with Vue.js
 
+## Mock API
+The mock back-end is created using [json-server](https://github.com/typicode/json-server). You need to have it installed globally in order to successfully run the project. This can be done with the following command:
+
+```
+npm install -g json-server
+```
+
+Then, you can start up the API, by running this command from the root project directory:
+```
+json-server --watch db.json
+```
+
 ## Build Setup
 
 ``` bash
