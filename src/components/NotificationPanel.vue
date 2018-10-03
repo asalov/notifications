@@ -27,51 +27,44 @@ export default {
   },
   props: {
     data: Array,
-    opened: Boolean,
+    isShown: Boolean,
   },
   data() {
     return {
-      timeOpened: null,
-      expirationCheckInterval: null,
       notifications: [],
+      timeouts: [],
     };
   },
-  computed: {
-    notificationTotal() {
-      return this.notifications.length;
-    },
-  },
   methods: {
-    showAvailableNotifications() {
-      const now = this.getSecondsTimestamp();
+    showNotifications() {
+      if (this.isShown) {
+        this.notifications = this.data.map((item) => {
+          if (!this.itemExists(item.id) && item.expires) {
+            const expiryTimeout = setTimeout(
+              () => this.$emit('notificationExpired', item.id),
+              (item.expires) * 1000,
+            );
+            this.timeouts = [...this.timeouts, expiryTimeout];
+          }
 
-      this.notifications = this.data.filter((item) => {
-        const { expires } = item;
-
-        if (expires) {
-          return (now - expires) <= this.timeOpened;
-        }
-
-        return true;
-      });
+          return item;
+        });
+      }
     },
-    getSecondsTimestamp() {
-      return new Date().getTime() / 1000;
+    itemExists(id) {
+      return this.notifications.find(item => item.id === id);
     },
   },
   watch: {
-    opened() {
-      this.timeOpened = this.getSecondsTimestamp();
-      this.showAvailableNotifications();
-
-      this.expirationCheckInterval = setInterval(this.showAvailableNotifications, 1000);
+    isShown() {
+      this.showNotifications();
     },
-    notificationTotal() {
-      this.$emit('notificationListChanged', this.notifications);
+    data() {
+      this.showNotifications();
     },
   },
   destroyed() {
-    clearInterval(this.expirationCheckInterval);
+    this.timeouts.forEach(timeout => clearTimeout(timeout));
   },
 };
 </script>

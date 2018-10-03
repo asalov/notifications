@@ -1,10 +1,15 @@
 <template>
   <div class="notification">
     <div class="notification-data">
+      <div
+        v-if="notificationType"
+        class="notification-type"
+        :class="notificationType"
+      >{{ notificationType }}</div>
       <h3>{{ item.title }}</h3>
       <p>
         <a
-          v-if="hasLink"
+          v-if="item.link"
           :href="itemContent"
           target="_blank"
         >{{ itemContent }}</a>
@@ -31,8 +36,10 @@ export default {
 
       return item[contentTypes[item.type]];
     },
-    hasLink() {
-      return this.item.link;
+    notificationType() {
+      const { type } = this.item;
+
+      return type !== 'text' ? type : null;
     },
   },
 };
@@ -46,6 +53,24 @@ export default {
 
 .notification:not(:last-child) {
   border-bottom: 1px solid #b8c0c7;
+}
+
+.notification-type {
+  display: inline-block;
+  color: #fff;
+  border-radius: 4px;
+  padding: 3px 5px;
+  text-transform: uppercase;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.bonus {
+  background: #65b979;
+}
+
+.promotion {
+  background: #d83c4a;
 }
 
 h3 {
